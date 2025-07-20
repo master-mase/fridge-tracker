@@ -55,6 +55,21 @@ function App() {
   const [calcValue, setCalcValue] = useState(''); // string for easier editing
   const [calcTarget, setCalcTarget] = useState<'add' | 'edit'>('add');
 
+  // Sorting state
+  const [sortBy, setSortBy] = useState<'expiration' | 'name' | 'category'>('expiration');
+
+  // Sort items based on sortBy
+  const sortedItems = [...items].sort((a, b) => {
+    if (sortBy === 'name') {
+      return a.name.localeCompare(b.name);
+    } else if (sortBy === 'category') {
+      return a.category.localeCompare(b.category);
+    } else {
+      // expiration (default)
+      return a.expiration.localeCompare(b.expiration);
+    }
+  });
+
   // Fetch food items from Firestore in real-time
   useEffect(() => {
     const q = query(collection(db, 'foodItems'), orderBy('expiration'));
@@ -143,7 +158,7 @@ function App() {
   // Open calculator dialog for add or edit
   const openCalcDialog = (target: 'add' | 'edit', current: number) => {
     setCalcTarget(target);
-    setCalcValue(current.toString());
+    setCalcValue(''); // Start empty, not with current value
     setCalcDialogOpen(true);
   };
   // Handle calculator number input
@@ -156,7 +171,8 @@ function App() {
   const handleCalcBack = () => setCalcValue(v => v.slice(0, -1));
   // Save calculator value
   const handleCalcSave = () => {
-    const val = Math.max(1, parseInt(calcValue || '1', 10));
+    // If the user entered nothing, default to 1
+    const val = Math.max(1, parseInt(calcValue === '' ? '1' : calcValue, 10));
     if (calcTarget === 'add') setQuantity(val);
     else setEditQuantity(val);
     setCalcDialogOpen(false);
@@ -281,6 +297,21 @@ function App() {
         </Box>
         <Box sx={{ my: 2 }}>
           <Typography variant="h6">Your Inventory</Typography>
+          {/* Sorting dropdown */}
+          <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2">Sort by:</Typography>
+            <TextField
+              select
+              size="small"
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value as 'expiration' | 'name' | 'category')}
+              sx={{ width: 150 }}
+            >
+              <MenuItem value="expiration">Expiration</MenuItem>
+              <MenuItem value="name">Name</MenuItem>
+              <MenuItem value="category">Category</MenuItem>
+            </TextField>
+          </Box>
           {/* Inventory list from Firestore */}
           {loading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
@@ -288,11 +319,11 @@ function App() {
             </Box>
           ) : listError ? (
             <Alert severity="error">{listError}</Alert>
-          ) : items.length === 0 ? (
+          ) : sortedItems.length === 0 ? (
             <Typography color="text.secondary">No items in your inventory.</Typography>
           ) : (
             <List>
-              {items.map(item => (
+              {sortedItems.map(item => (
                 <ListItem key={item.id} divider
                   secondaryAction={
                     <>
