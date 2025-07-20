@@ -1,23 +1,34 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# Node modules and build output
 /node_modules
-/.pnp
-.pnp.js
-
-# testing
-/coverage
-
-# production
 /build
 
-# misc
+# Testing
+/coverage
+
+# Misc
 .DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
+.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
+.env.development
+.env.test
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Firebase service account keys
+serviceAccountKey.json
+firebase-adminsdk-*.json
+
+# VSCode settings
+.vscode/
+
+# OS generated files
+Thumbs.db
