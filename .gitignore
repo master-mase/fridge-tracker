@@ -9,7 +9,7 @@
 
 # Misc
 .DS_Store
-npm-debug.log*
+npm list typescriptnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
